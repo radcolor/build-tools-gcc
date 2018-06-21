@@ -1,5 +1,6 @@
 */
 binutils
 gcc
+glibc
 linux
 *.tar*
