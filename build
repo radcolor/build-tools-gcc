@@ -367,6 +367,36 @@ function build_binaries() {
         make -C "${PXZ}" "${JOBS}" pxz || die "Error building pxz!"
         mv "${PXZ}"/pxz "${PREBUILTS_BIN}"
     fi
+
+    if [[ ! -f $(dirname "${PREBUILTS_BIN}")/lib/liblz.a ]]; then
+        LZLIB=lzlib-1.11
+        (
+            cd sources || die "Failed to create sources directory!"
+            [[ ! -f ${LZLIB}.tar.gz ]] && wget https://download.savannah.gnu.org/releases/lzip/lzlib/${LZLIB}.tar.gz
+            [[ ! -d ${LZLIB} ]] && tar -xf ${LZLIB}.tar.gz
+            (
+                cd "${LZLIB}" || die "Issue with extracting lzlib source!"
+                ./configure --prefix="$(dirname "${PREBUILTS_BIN}")"
+                make "${JOBS}" || die "Error building lzlib!"
+                make install "${JOBS}" || die "Error installing lzlib!"
+            )
+        )
+    fi
+
+    if [[ ! -f ${PREBUILTS_BIN}/plzip ]]; then
+        PLZIP=plzip-1.8
+        (
+            cd sources || die "Failed to create sources directory!"
+            [[ ! -f ${PLZIP}.tar.gz ]] && wget https://download.savannah.gnu.org/releases/lzip/plzip/${PLZIP}.tar.gz
+            [[ ! -d ${PLZIP} ]] && tar -xf ${PLZIP}.tar.gz
+            (
+                cd ${PLZIP} || die "Issue with extracting plzip source!"
+                ./configure --prefix="$(dirname "${PREBUILTS_BIN}")" CXXFLAGS="-Wall -W -O2 -I$(dirname "${PREBUILTS_BIN}")/include -L$(dirname "${PREBUILTS_BIN}")/lib"
+                make "${JOBS}" || die "Error building plzip!"
+                make install "${JOBS}" || die "Error installing plzip!"
+            )
+        )
+    fi
 }
 
 
@@ -454,6 +484,7 @@ function download_sources() {
 function extract() {
     case "${1}" in
         *.gz) UNPACK=pigz ;;
+        *.lz) UNPACK=plzip ;;
         *.xz) UNPACK=pxz ;;
     esac
     mkdir -p "${2}"
