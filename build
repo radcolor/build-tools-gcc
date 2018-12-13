@@ -179,8 +179,8 @@ function setup_variables() {
 
     # Configuration variables
     CONFIGURATION=( "--disable-multilib" "--disable-werror"
-                    "CFLAGS=-g0 -O2 -fstack-protector-strong"
-                    "CXXFLAGS=-g0 -O2 -fstack-protector-strong" )
+                    "CFLAGS=-g0 -O3 -fstack-protector-strong"
+                    "CXXFLAGS=-g0 -O3 -fstack-protector-strong" )
     JOBS="-j$(($(nproc --all) + 1))"
     DEPTH_FLAG=true
 
