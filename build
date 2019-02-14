@@ -54,10 +54,10 @@ function help_menu() {
     echo "${BOLD}OPTIONAL PARAMETERS:${RST}"
     echo "  -f  | --full-src:    Download full git repos instead of shallow clones"
     echo "  -j  | --jobs:        Specify the amount of threads to use. This overrides the default detection"
-    echo "  -nt | --no-tmpfs:    Do not use tmpfs for building (useful if you don't have much RAM)."
     echo "  -nu | --no-update:   Do not update the downloaded components before building (useful if you have slow internet)."
     echo "  -p  | --package:     Possible values: gz or xz. Compresses toolchain after build."
-    echo "  -t  | --tarballs:    Use tarballs for binutils, MPFR, MPC, ISL, glibc, and, GCC"
+    echo "  -tm | --tmpfs:       Use tmpfs for building (useful if you have much RAM)."
+    echo "  -tr | --tarballs:    Use tarballs for binutils, MPFR, MPC, ISL, glibc, and, GCC"
     echo "  -V  | --verbose:     Make script print all output, not just errors and the ending information"
     echo
 }
@@ -147,14 +147,14 @@ function check_sudo() {
     echo "Checking if sudo is available, please enter your password if a prompt appears!"
     if ! sudo -v 2>/dev/null; then
         warn "Sudo is not available! Disabling the option for tmpfs..." -n
-        NO_TMPFS=true
+        unset TMPFS
     fi
 }
 
 
 # Unmount tmpfs
 function unmount_tmpfs() {
-    if [[ -z ${NO_TMPFS} ]]; then
+    if [[ -n ${TMPFS} ]]; then
         sudo umount -f build-glibc 2>/dev/null
         sudo umount -f build-gcc 2>/dev/null
         sudo umount -f build-binutils 2>/dev/null
@@ -220,10 +220,10 @@ function parse_parameters() {
             # OPTIONAL FLAGS
             "-f"|"--full-src") DEPTH_FLAG=false ;;
             "-j"|"--jobs") shift && JOBS=-j${1} ;;
-            "-nt"|"--no-tmpfs") NO_TMPFS=true ;;
             "-nu"|"--no-update") NO_UPDATE=true ;;
             "-p"|"--package") shift && COMPRESSION=${1} ;;
-            "-t"|"--tarballs") TARBALLS=true ;;
+            "-tm"|"--tmpfs") TMPFS=true ;;
+            "-tr"|"--tarballs") TARBALLS=true ;;
             "-V"|"--verbose") VERBOSE=true ;;
 
             # HELP!
@@ -233,7 +233,7 @@ function parse_parameters() {
         shift
     done
 
-    [[ -z ${NO_TMPFS} ]] && check_sudo
+    [[ -n ${TMPFS} ]] && check_sudo
     [[ -z ${VERBOSE} ]] && exec 6>&2 5>&1 &>/dev/null
 
     # Default values
@@ -642,7 +642,7 @@ function setup_env() {
     mkdir build-gcc
     mkdir build-binutils
 
-    if [[ -z ${NO_TMPFS} ]]; then
+    if [[ -n ${TMPFS} ]]; then
         sudo mount -t tmpfs -o rw none build-glibc
         sudo mount -t tmpfs -o rw none build-gcc
         sudo mount -t tmpfs -o rw none build-binutils
