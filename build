@@ -321,6 +321,12 @@ function clean_up() { #FIXME: we dont need to remove everything everytime.
 function build_binaries() {
     ROOT=${PWD}
     PREBUILTS_BIN=${ROOT}/prebuilts/bin
+    DOWNLOADER=$(command -v wget || command -v curl)
+    if [[ -n ${DOWNLOADER} ]]; then
+        [[ ${DOWNLOADER} = "curl" ]] && DOWNLOADER+=" -LO"
+    else
+        die "Neither wget nor curl could be found on your system!"
+    fi
     mkdir -p sources
 
     if [[ ! -f ${PREBUILTS_BIN}/txt2man ]]; then
@@ -372,7 +378,7 @@ function build_binaries() {
         LZLIB=lzlib-1.11
         (
             cd sources || die "Failed to create sources directory!"
-            [[ ! -f ${LZLIB}.tar.gz ]] && wget https://download.savannah.gnu.org/releases/lzip/lzlib/${LZLIB}.tar.gz
+            [[ ! -f ${LZLIB}.tar.gz ]] && ${DOWNLOADER} https://download.savannah.gnu.org/releases/lzip/lzlib/${LZLIB}.tar.gz
             [[ ! -d ${LZLIB} ]] && tar -xf ${LZLIB}.tar.gz
             (
                 cd "${LZLIB}" || die "Issue with extracting lzlib source!"
@@ -387,7 +393,7 @@ function build_binaries() {
         PLZIP=plzip-1.8
         (
             cd sources || die "Failed to create sources directory!"
-            [[ ! -f ${PLZIP}.tar.gz ]] && wget https://download.savannah.gnu.org/releases/lzip/plzip/${PLZIP}.tar.gz
+            [[ ! -f ${PLZIP}.tar.gz ]] && ${DOWNLOADER} https://download.savannah.gnu.org/releases/lzip/plzip/${PLZIP}.tar.gz
             [[ ! -d ${PLZIP} ]] && tar -xf ${PLZIP}.tar.gz
             (
                 cd ${PLZIP} || die "Issue with extracting plzip source!"
