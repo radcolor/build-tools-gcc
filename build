@@ -527,13 +527,8 @@ function download_sources() {
 
 
 function extract() {
-    case "${1}" in
-        *.gz) UNPACK=pigz ;;
-        *.lz) UNPACK=plzip ;;
-        *.xz) UNPACK=pxz ;;
-    esac
     mkdir -p "${2}"
-    ${UNPACK} -d < "${1}" | tar -xC "${2}" --strip-components=1
+    tar xf "${1}" -C "${2}" --strip-components=1
 }
 
 
