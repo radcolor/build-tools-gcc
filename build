@@ -145,20 +145,15 @@ function check_date() {
 function check_sudo() {
     echo
     echo "Checking if sudo is available, please enter your password if a prompt appears!"
-    if ! sudo -v 2>/dev/null; then
-        warn "Sudo is not available! Disabling the option for tmpfs..." -n
-        unset TMPFS
-    fi
+    sudo -v 2>/dev/null || die "Sudo is not available!" -n
 }
 
 
 # Unmount tmpfs
 function unmount_tmpfs() {
-    if [[ -n ${TMPFS} ]]; then
-        sudo umount -f build-glibc 2>/dev/null
-        sudo umount -f build-gcc 2>/dev/null
-        sudo umount -f build-binutils 2>/dev/null
-    fi
+    sudo umount -f build-glibc 2>/dev/null
+    sudo umount -f build-gcc 2>/dev/null
+    sudo umount -f build-binutils 2>/dev/null
 }
 
 
@@ -233,7 +228,7 @@ function parse_parameters() {
         shift
     done
 
-    [[ -n ${TMPFS} ]] && check_sudo
+    check_sudo
     [[ -z ${VERBOSE} ]] && exec 6>&2 5>&1 &>/dev/null
 
     # Default values
@@ -321,6 +316,7 @@ function parse_parameters() {
 function clean_up() { #FIXME: we dont need to remove everything everytime.
     header "CLEANING UP"
 
+    [[ -z ${TMPFS} ]] && { for i in binutils gcc glibc; do rm -rf build-$i/*; done; }
     unmount_tmpfs
     git clean -fxdq -e sources -e prebuilts -e patches
     find . -maxdepth 1 -type l -exec rm -rf {} \; #FIXME
@@ -656,6 +652,11 @@ function setup_env() {
         sudo mount -t tmpfs -o rw none build-glibc
         sudo mount -t tmpfs -o rw none build-gcc
         sudo mount -t tmpfs -o rw none build-binutils
+    else
+        # Bind mount from somewhere else, assuming these folders exist
+        sudo mount -B "${HOME}"/KudProject/build/build-tools-gcc/glibc build-glibc
+        sudo mount -B "${HOME}"/KudProject/build/build-tools-gcc/gcc build-gcc
+        sudo mount -B "${HOME}"/KudProject/build/build-tools-gcc/binutils build-binutils
     fi
 
     cd gcc || die "GCC folder does not exit!"
