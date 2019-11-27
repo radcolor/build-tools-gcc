@@ -331,7 +331,7 @@ function build_binaries() {
         (
             cd "${TXT2MAN}" || die "Issue with cloning txt2man source!"
             make prefix="$(dirname "${PREBUILTS_BIN}")" install || die "Error installing txt2man!"
-        )
+        ) || exit
     fi
 
     export PATH=${PREBUILTS_BIN}:${PATH}
@@ -347,7 +347,7 @@ function build_binaries() {
             ./configure --prefix="$(dirname "${PREBUILTS_BIN}")"
             make "${JOBS}" || die "Error building axel!"
             make "${JOBS}" install || die "Error installing axel!"
-        )
+        ) || exit
     fi
 
     if [[ ! -f ${PREBUILTS_BIN}/pigz ]]; then
@@ -495,27 +495,27 @@ function update_repos() {
             git checkout -f ${ISL} || git checkout -f -b ${ISL} ${BRANCH}
             git reset --hard ${BRANCH}
             ./autogen.sh
-        )
+        ) || exit
         (
             cd binutils || die "binutils did not get cloned properly!"
             [[ -n ${FULL_SOURCE} ]] && BRANCH=origin/${BINUTILS_git} || BRANCH=FETCH_HEAD
             git_fetch origin ${BINUTILS_git}
             git checkout -f ${BINUTILS_git} || git checkout -f -b ${BINUTILS_git} ${BRANCH}
             git reset --hard ${BRANCH}
-        )
+        ) || exit
         (
             cd gcc || die "GCC did not get cloned properly!"
             [[ -n ${FULL_SOURCE} ]] && BRANCH=origin/${GCC} || BRANCH=FETCH_HEAD
             git_fetch origin ${GCC}
             git checkout -f ${GCC} || git checkout -f -b ${GCC} ${BRANCH}
             git reset --hard ${BRANCH}
-        )
+        ) || exit
     else
         if [[ -d isl ]]; then
             (
                 cd isl || die "ISL did not get downloaded properly!"
                 ./autogen.sh
-            )
+            ) || exit
         fi
     fi
 
