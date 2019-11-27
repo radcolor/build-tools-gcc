@@ -354,8 +354,8 @@ function build_binaries() {
     mkdir -p sources
 
     if [[ -z ${HAS_AXEL} && ! -f ${PREBUILTS_BIN}/txt2man ]]; then
-        TXT2MAN=${ROOT}/sources/txt2man
-        [[ ! -d ${TXT2MAN} ]] && git -C "$(dirname "${TXT2MAN}")" clone --depth=1 https://github.com/mvertes/txt2man
+        TXT2MAN=/tmp/sources/txt2man
+        [[ ! -d ${TXT2MAN} ]] && git clone --depth=1 https://github.com/mvertes/txt2man "${TXT2MAN}"
         git -C "${TXT2MAN}" clean -fxdq
         git -C "${TXT2MAN}" pull
         (
@@ -367,8 +367,8 @@ function build_binaries() {
     export PATH=${PREBUILTS_BIN}:${PATH}
 
     if [[ -z ${HAS_AXEL} && ! -f ${PREBUILTS_BIN}/axel ]]; then
-        AXEL=${ROOT}/sources/axel
-        [[ ! -d ${AXEL} ]] && git -C "$(dirname "${AXEL}")" clone --depth=1 https://github.com/axel-download-accelerator/axel
+        AXEL=/tmp/sources/axel
+        [[ ! -d ${AXEL} ]] && git clone --depth=1 https://github.com/axel-download-accelerator/axel "${AXEL}"
         git -C "${AXEL}" clean -fxdq
         git -C "${AXEL}" pull
         (
@@ -381,8 +381,8 @@ function build_binaries() {
     fi
 
     if [[ ! -f ${PREBUILTS_BIN}/pigz ]]; then
-        PIGZ=${ROOT}/sources/pigz
-        [[ ! -d ${PIGZ} ]] && git -C "$(dirname "${PIGZ}")" clone --depth=1 https://github.com/madler/pigz
+        PIGZ=/tmp/sources/pigz
+        [[ ! -d ${PIGZ} ]] && git clone --depth=1 https://github.com/madler/pigz "${PIGZ}"
         git -C "${PIGZ}" clean -fxdq
         git -C "${PIGZ}" pull
         make -C "${PIGZ}" "${JOBS}" pigz || die "Error building pigz!"
@@ -390,8 +390,8 @@ function build_binaries() {
     fi
 
     if [[ ! -f ${PREBUILTS_BIN}/pxz ]]; then
-        PXZ=${ROOT}/sources/pxz
-        [[ ! -d ${PXZ} ]] && git -C "$(dirname "${PXZ}")" clone --depth=1 https://github.com/krasCGQ/pxz
+        PXZ=/tmp/sources/pxz
+        [[ ! -d ${PXZ} ]] && git clone --depth=1 https://github.com/krasCGQ/pxz "${PXZ}"
         git -C "${PXZ}" clean -fxdq
         git -C "${PXZ}" pull
         make -C "${PXZ}" "${JOBS}" pxz || die "Error building pxz!"
@@ -403,9 +403,10 @@ function build_binaries() {
         (
             cd sources || die "Failed to create sources directory!"
             [[ ! -f ${LZLIB}.tar.gz ]] && ${DOWNLOADER} https://download.savannah.gnu.org/releases/lzip/lzlib/${LZLIB}.tar.gz
-            [[ ! -d ${LZLIB} ]] && tar -xf ${LZLIB}.tar.gz
+            mkdir -p /tmp/sources
+            [[ ! -d /tmp/sources/${LZLIB} ]] && tar -C /tmp/sources -xf ${LZLIB}.tar.gz
             (
-                cd "${LZLIB}" || die "Issue with extracting lzlib source!"
+                cd /tmp/sources/${LZLIB} || die "Issue with extracting lzlib source!"
                 ./configure --prefix="$(dirname "${PREBUILTS_BIN}")"
                 make "${JOBS}" || die "Error building lzlib!"
                 make install "${JOBS}" || die "Error installing lzlib!"
@@ -418,15 +419,18 @@ function build_binaries() {
         (
             cd sources || die "Failed to create sources directory!"
             [[ ! -f ${PLZIP}.tar.gz ]] && ${DOWNLOADER} https://download.savannah.gnu.org/releases/lzip/plzip/${PLZIP}.tar.gz
-            [[ ! -d ${PLZIP} ]] && tar -xf ${PLZIP}.tar.gz
+            mkdir -p /tmp/sources
+            [[ ! -d /tmp/sources/${PLZIP} ]] && tar -C /tmp/sources -xf ${PLZIP}.tar.gz
             (
-                cd ${PLZIP} || die "Issue with extracting plzip source!"
+                cd /tmp/sources/${PLZIP} || die "Issue with extracting plzip source!"
                 ./configure --prefix="$(dirname "${PREBUILTS_BIN}")" CXXFLAGS="-Wall -W -O2 -I$(dirname "${PREBUILTS_BIN}")/include -L$(dirname "${PREBUILTS_BIN}")/lib"
                 make "${JOBS}" || die "Error building plzip!"
                 make install "${JOBS}" || die "Error installing plzip!"
             )
         )
     fi
+
+    rm -rf /tmp/sources
 }
 
 
