@@ -343,8 +343,9 @@ function clean_up() { #FIXME: we dont need to remove everything everytime.
 function build_binaries() {
     ROOT=${PWD}
     PREBUILTS_BIN=${ROOT}/prebuilts/bin
-    DOWNLOADER=$(command -v wget || command -v curl)
+    DOWNLOADER=$(command -v aria2c || command -v wget || command -v curl)
     if [[ -n ${DOWNLOADER} ]]; then
+        [[ ${DOWNLOADER} = "aria2c" ]] && DOWNLOADER+=" -x16"
         [[ ${DOWNLOADER} = "curl" ]] && DOWNLOADER+=" -LO"
     else
         die "Neither wget nor curl could be found on your system!"
