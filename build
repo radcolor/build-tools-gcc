@@ -350,9 +350,10 @@ function build_binaries() {
     else
         die "Neither wget nor curl could be found on your system!"
     fi
+    HAS_AXEL=$(command -v axel)
     mkdir -p sources
 
-    if [[ ! -f ${PREBUILTS_BIN}/txt2man ]]; then
+    if [[ -z ${HAS_AXEL} && ! -f ${PREBUILTS_BIN}/txt2man ]]; then
         TXT2MAN=${ROOT}/sources/txt2man
         [[ ! -d ${TXT2MAN} ]] && git -C "$(dirname "${TXT2MAN}")" clone --depth=1 https://github.com/mvertes/txt2man
         git -C "${TXT2MAN}" clean -fxdq
@@ -365,7 +366,7 @@ function build_binaries() {
 
     export PATH=${PREBUILTS_BIN}:${PATH}
 
-    if [[ ! -f ${PREBUILTS_BIN}/axel ]]; then
+    if [[ -z ${HAS_AXEL} && ! -f ${PREBUILTS_BIN}/axel ]]; then
         AXEL=${ROOT}/sources/axel
         [[ ! -d ${AXEL} ]] && git -C "$(dirname "${AXEL}")" clone --depth=1 https://github.com/axel-download-accelerator/axel
         git -C "${AXEL}" clean -fxdq
