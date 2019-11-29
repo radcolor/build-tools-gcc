@@ -567,7 +567,9 @@ function setup_env() {
         GCC_PATCH="GCC_10_up"
     fi
 
-    patch -Np1 < "${ROOT}"/patches/${GCC_PATCH}.patch || die "Failed to patch GCC source!"
+    if [[ -z ${NO_UPDATE} ]]; then
+        patch -Np1 < "${ROOT}"/patches/${GCC_PATCH}.patch || die "Failed to patch GCC source!"
+    fi
 
     cd ..
 
