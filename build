@@ -191,7 +191,7 @@ function setup_variables() {
     # Binary versions
     BINUTILS_git="master"
     BINUTILS_tar="2.33.1"
-    GMP="gmp-6.1.99-$(check_date)"
+    GMP="gmp-6.2.0"
     MPFR_svn="trunk"
     MPFR_tar="mpfr-4.0.2"
     MPC_git="master"
@@ -382,7 +382,7 @@ function download_sources() {
 
     if [[ ! -f ${GMP}.tar.lz ]]; then
         header "DOWNLOADING GMP"
-        dl_file https://gmplib.org/download/snapshot/"${GMP}".tar.lz
+        dl_file https://gmplib.org/download/gmp/"${GMP}".tar.lz
     fi
 
     if [[ ! -f linux-${LINUX}.tar.xz ]]; then
