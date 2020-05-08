@@ -49,7 +49,7 @@ function help_menu() {
     echo "${BOLD}REQUIRED PARAMETERS:${RST}"
     echo "  -a  | --arch:        Possible values: arm, arm64, host, i686, or x86_64. This is the toolchain's target architecture. If host is specified, target the host instead."
     echo "  -s  | --source:      Possible values: gnu or linaro. This is the GCC source (GNU official vs. Linaro fork)."
-    echo "  -v  | --version:     Possible values: (4, 5, 6, 7, 8, 9*, and 10* [*GNU only]). This is the GCC version to build. If host is specified in ARCH, only version that matches or newer than the distribution one is allowed."
+    echo "  -v  | --version:     Possible values: (4, 5, 6, 7, 8, 9*, 10* and 11* [*GNU only]). This is the GCC version to build. If host is specified in ARCH, only version that matches or newer than the distribution one is allowed."
     echo
     echo "${BOLD}OPTIONAL PARAMETERS:${RST}"
     echo "  -f  | --full-src:    Download full git repos instead of shallow clones"
@@ -266,7 +266,8 @@ function parse_parameters() {
             "gnu:7") GCC=gcc-7-branch ;;
             "gnu:8") GCC=gcc-8-branch ;;
             "gnu:9") GCC=gcc-9-branch ;;
-            "gnu:10") GCC=master ;;
+            "gnu:10") GCC=gcc-10-branch ;;
+            "gnu:11") GCC=master ;;
             "linaro:4") GCC=linaro-local/releases/linaro-4.9-2017.01
                         GLIBC_git="release/2.27/master"
                         ISL_git="isl-0.17.1" ;;
@@ -296,7 +297,8 @@ function parse_parameters() {
             "gnu:7") GCC=gcc-7.4.0 ;;
             "gnu:8") GCC=gcc-8.3.0 ;;
             "gnu:9") GCC=gcc-9.2.0 ;;
-            "gnu:10") die "GCC 10.0 is currently a WIP so there is no tarball to download! Either use the git repo or choose a new version..." ;;
+            "gnu:10") GCC=gcc-10.1.0 ;;
+            "gnu:11") die "GCC 11.0 is currently a WIP so there is no tarball to download! Either use the git repo or choose a new version..." ;;
             "linaro:4") GCC=linaro-4.9-2017.01
                         GLIBC_tar="glibc-2.27"
                         ISL_tar="isl-0.17.1" ;;
