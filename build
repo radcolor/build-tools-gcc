@@ -200,7 +200,7 @@ function setup_variables() {
     ISL_tar="isl-0.22"
     GLIBC_git="master"
     GLIBC_tar="glibc-2.29"
-    LINUX="5.4"
+    LINUX="5.8"
 
     # Start of script
     START=$(date +%s)
