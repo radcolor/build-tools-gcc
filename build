@@ -764,7 +764,8 @@ function ending_info() {
         header "BUILD SUCCESSFUL" ${VERBOSE:-"--no-first-echo"}
         echo "${BOLD}Script duration:${RST} $(format_time "${START}" "${END}")"
         echo "${BOLD}GCC version:${RST} $(${TARGET}/bin/${TARGET}-gcc --version | head -n 1)"
-        echo "${BOLD}COMMIT HEAD:${RST} $(cd sources/gcc/ && git log --pretty=format:'%h : %s' -1)"
+        GCC_HEAD_COMMIT=$(cd sources/gcc/ && git rev-parse HEAD)
+        echo "${BOLD}GCC COMMIT HEAD:${RST} ${GCC_HEAD_COMMIT}"
         if [[ -n ${COMPRESSION} ]] && [[ -e ${PACKAGE} ]]; then
             echo "${BOLD}File location:${RST} $(pwd)/${PACKAGE}"
             echo "${BOLD}File size:${RST} $(du -h "${PACKAGE}" | awk '{print $1}')"
@@ -779,6 +780,44 @@ function ending_info() {
     echo "\a"
 }
 
+function push_sources()
+{
+    DATE="$(date "+%B %-d, %Y")"
+    BUILDER_COMMIT="$(git rev-parse HEAD)"
+    if [ ${TARGET} == "arm-linux-gnueabi" ]; then
+        git clone "https://theradcolor:${GITHUB_TOKEN}@github.com/theradcolor/arm-linux-gnueabi" upstream
+        cd upstream || exit
+        rm -rf *
+        cp -r ../${TARGET}/* .
+        git checkout README.md && git add .
+        git commit -m "toolchain: Update to ${DATE} build
+
+GCC COMMIT URL: https://github.com/gcc-mirror/gcc/commit/${GCC_HEAD_COMMIT}
+BUILDER COMMIT: ${BUILDER_COMMIT}" && git push
+    elif [ ${TARGET} == "aarch64-linux-gnu" ]; then
+        git clone "https://theradcolor:${GITHUB_TOKEN}@github.com/theradcolor/aarch64-linux-gnu" upstream
+        cd upstream || exit
+        rm -rf *
+        cp -r ../${TARGET}/* .
+        git checkout README.md && git add .
+        git commit -m "toolchain: Update to ${DATE} build
+
+GCC COMMIT URL: https://github.com/gcc-mirror/gcc/commit/${GCC_HEAD_COMMIT}
+BUILDER COMMIT: ${BUILDER_COMMIT}" && git push
+    elif [ ${TARGET} == "x86_64-linux-gnu" ]; then
+        git clone "https://theradcolor:${GITHUB_TOKEN}@github.com/theradcolor/x86_64-linux-gnu" upstream
+        cd upstream || exit
+        rm -rf *
+        cp -r ../${TARGET}/* .
+        git checkout README.md && git add .
+        git commit -m "toolchain: Update to ${DATE} build
+
+GCC COMMIT URL: https://github.com/gcc-mirror/gcc/commit/${GCC_HEAD_COMMIT}
+BUILDER COMMIT: ${BUILDER_COMMIT}" && git push
+    else
+        echo "Skipping push!"
+    fi
+}
 
 setup_variables
 parse_parameters "${@}"
@@ -797,3 +836,4 @@ build_glibc
 install_gcc
 package_tc
 ending_info
+push_sources
