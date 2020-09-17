@@ -1,0 +1,13 @@
+kind: pipeline
+name: GNU GCC TC BUILD
+
+steps:
+- name: GNU GCC ARM
+  image: archlinux:latest
+  commands:
+    - pacman -Sy base-devel git subversion autoconf-archive tar xz pixz lzip aria2 zip parallel zstd rsync python python3 --noconfirm
+    - git clone https://github.com/theradcolor/build-tools-gcc.git
+    - bash build -a arm -s gnu -v 10 -V -p xz -tr
+trigger:
+  branch:
+    - master
