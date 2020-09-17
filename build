@@ -193,7 +193,7 @@ function setup_variables() {
     BINUTILS_tar="2.33.1"
     GMP="gmp-6.2.0"
     MPFR_svn="trunk"
-    MPFR_tar="mpfr-4.0.2"
+    MPFR_tar="mpfr-4.1.0"
     MPC_git="master"
     MPC_tar="mpc-1.1.0"
     ISL_git="master"
