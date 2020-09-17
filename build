@@ -55,7 +55,7 @@ function help_menu() {
     echo "  -f  | --full-src:    Download full git repos instead of shallow clones"
     echo "  -j  | --jobs:        Specify the amount of threads to use. This overrides the default detection"
     echo "  -nu | --no-update:   Do not update the downloaded components before building (useful if you have slow internet)."
-    echo "  -p  | --package:     Possible values: gz or xz. Compresses toolchain after build."
+    echo "  -p  | --package:     Possible values: gz, xz or zstd. Compresses toolchain after build."
     echo "  -tm | --tmpfs:       Use tmpfs for building (useful if you have much RAM)."
     echo "  -tr | --tarballs:    Use tarballs for binutils, MPFR, MPC, ISL, glibc, and, GCC"
     echo "  -V  | --verbose:     Make script print all output, not just errors and the ending information"
@@ -745,6 +745,9 @@ function package_tc() {
             "xz")
                 echo "Packaging with XZ..."
                 XZ_OPT=-9 tar -c --use-compress-program=pxz -f "${PACKAGE}" ${TARGET} ;;
+            "zstd")
+                echo "Packaging with ZSTD..."
+                ZSTD_OPT=-9 tar -c --use-compress-program=zstd -f "${PACKAGE}" ${TARGET} ;;
             *)
                 die "Invalid compression specified... skipping" ;;
         esac
