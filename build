@@ -790,30 +790,48 @@ function push_sources()
         rm -rf *
         cp -r ../${TARGET}/* .
         git checkout README.md && git add .
+        if [ "${TARBALLS}" == false ]; then
         git commit -m "toolchain: Update to ${DATE} build
 
 GCC COMMIT URL: https://github.com/gcc-mirror/gcc/commit/${GCC_HEAD_COMMIT}
 BUILDER COMMIT: ${BUILDER_COMMIT}" && git push
+        elif [ "${TARBALLS}" == true ]; then
+        git commit -m "toolchain: Update to ${DATE} build
+
+BUILDER COMMIT: ${BUILDER_COMMIT}" && git push
+        fi
     elif [ ${TARGET} == "aarch64-linux-gnu" ]; then
         git clone "https://theradcolor:${GITHUB_TOKEN}@github.com/theradcolor/aarch64-linux-gnu" upstream
         cd upstream || exit
         rm -rf *
         cp -r ../${TARGET}/* .
         git checkout README.md && git add .
+        if [ "${TARBALLS}" == false ]; then
         git commit -m "toolchain: Update to ${DATE} build
 
 GCC COMMIT URL: https://github.com/gcc-mirror/gcc/commit/${GCC_HEAD_COMMIT}
 BUILDER COMMIT: ${BUILDER_COMMIT}" && git push
+        elif [ "${TARBALLS}" == true ]; then
+        git commit -m "toolchain: Update to ${DATE} build
+
+BUILDER COMMIT: ${BUILDER_COMMIT}" && git push
+        fi
     elif [ ${TARGET} == "x86_64-linux-gnu" ]; then
         git clone "https://theradcolor:${GITHUB_TOKEN}@github.com/theradcolor/x86_64-linux-gnu" upstream
         cd upstream || exit
         rm -rf *
         cp -r ../${TARGET}/* .
         git checkout README.md && git add .
+        if [ "${TARBALLS}" == false ]; then
         git commit -m "toolchain: Update to ${DATE} build
 
 GCC COMMIT URL: https://github.com/gcc-mirror/gcc/commit/${GCC_HEAD_COMMIT}
 BUILDER COMMIT: ${BUILDER_COMMIT}" && git push
+        elif [ "${TARBALLS}" == true ]; then
+        git commit -m "toolchain: Update to ${DATE} build
+
+BUILDER COMMIT: ${BUILDER_COMMIT}" && git push
+        fi
     else
         echo "Skipping push!"
     fi
