@@ -764,8 +764,14 @@ function ending_info() {
         header "BUILD SUCCESSFUL" ${VERBOSE:-"--no-first-echo"}
         echo "${BOLD}Script duration:${RST} $(format_time "${START}" "${END}")"
         echo "${BOLD}GCC version:${RST} $(${TARGET}/bin/${TARGET}-gcc --version | head -n 1)"
-        GCC_HEAD_COMMIT=$(cd sources/gcc/ && git rev-parse HEAD)
-        echo "${BOLD}GCC COMMIT HEAD:${RST} ${GCC_HEAD_COMMIT}"
+        
+        # Only if we not using tarballs
+        if [ "${TARBALLS}" == false ]; then
+            GCC_HEAD_COMMIT=$(cd sources/gcc/ && git rev-parse HEAD)
+            echo "${BOLD}GCC COMMIT HEAD:${RST} ${GCC_HEAD_COMMIT}"
+            cd ../..
+        fi
+        
         if [[ -n ${COMPRESSION} ]] && [[ -e ${PACKAGE} ]]; then
             echo "${BOLD}File location:${RST} $(pwd)/${PACKAGE}"
             echo "${BOLD}File size:${RST} $(du -h "${PACKAGE}" | awk '{print $1}')"
