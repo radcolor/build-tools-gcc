@@ -11,7 +11,7 @@ steps:
     - "export GITHUB_TOKEN"
     - pacman -Sy base-devel git subversion autoconf-archive tar xz pixz lzip aria2 zip parallel zstd rsync python python3 --noconfirm
     - git clone https://github.com/theradcolor/build-tools-gcc.git
-    - bash build -a arm -s gnu -v 11 -V -p zstd
+    - script -c "bash -x build -a arm -s gnu -v 11 -V -p zstd" build-arm-gnu-gcc.log
 
 ---
 kind: pipeline
@@ -27,7 +27,7 @@ steps:
     - "export GITHUB_TOKEN"
     - pacman -Sy base-devel git subversion autoconf-archive tar xz pixz lzip aria2 zip parallel zstd rsync python python3 --noconfirm
     - git clone https://github.com/theradcolor/build-tools-gcc.git
-    - bash build -a arm64 -s gnu -v 11 -V -p zstd
+    - script -c "bash -x build -a arm64 -s gnu -v 11 -V -p zstd" build-arm64-gnu-gcc.log
 
 ---
 kind: pipeline
@@ -43,7 +43,7 @@ steps:
     - "export GITHUB_TOKEN"
     - pacman -Sy base-devel git subversion autoconf-archive tar xz pixz lzip aria2 zip parallel zstd rsync python python3 --noconfirm
     - git clone https://github.com/theradcolor/build-tools-gcc.git
-    - bash build -a x86_64 -s gnu -v 11 -V -p zstd
+    - script -c "bash -x build -a x86_64 -s gnu -v 11 -V -p zstd" build-x86_64-gnu-gcc.log
 
 trigger:
   branch:
