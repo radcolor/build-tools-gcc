@@ -766,9 +766,11 @@ function ending_info() {
         echo "${BOLD}GCC version:${RST} $(${TARGET}/bin/${TARGET}-gcc --version | head -n 1)"
         
         # Only if we not using tarballs
-        GCC_HEAD_COMMIT=$(cd sources/gcc/ && git rev-parse HEAD)
-        echo "${BOLD}GCC COMMIT HEAD:${RST} ${GCC_HEAD_COMMIT}"
-        # Only if we not using tarballs
+        if [ "${TARBALLS}" == false ]; then
+            GCC_HEAD_COMMIT=$(cd sources/gcc/ && git rev-parse HEAD)
+            echo "${BOLD}GCC COMMIT HEAD:${RST} ${GCC_HEAD_COMMIT}"
+            cd ../..
+        fi
         
         if [[ -n ${COMPRESSION} ]] && [[ -e ${PACKAGE} ]]; then
             echo "${BOLD}File location:${RST} $(pwd)/${PACKAGE}"
