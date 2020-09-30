@@ -849,6 +849,29 @@ BUILDER COMMIT: ${BUILDER_COMMIT}" && git push
     fi
 }
 
+function push_logs()
+{
+    TG_TOKEN="123:xyz"
+    CHAT_ID="-1001375712567"
+
+    if [ ${TARGET} == "arm-linux-gnueabi" ]; then
+        LOG="/drone/src/build-arm-gnu-gcc.log"
+    elif [ ${TARGET} == "aarch64-linux-gnu" ]; then
+        LOG="/drone/src/build-arm64-gnu-gcc.log"
+    elif [ ${TARGET} == "x86_64-linux-gnu" ]; then
+        LOG="/drone/src/build-x86_64-gnu-gcc.log"
+    else
+        echo "No scripting"
+    fi
+
+	curl -F document=@"${LOG}" "https://api.telegram.org/bot${TG_TOKEN}/sendDocument" \
+		-F chat_id="${CHAT_ID}" \
+		-F "disable_web_page_preview=false" \
+		-F "parse_mode=html" \
+        -F caption="Build logs GCC for Target: ${TARGET}"
+
+}
+
 setup_variables
 parse_parameters "${@}"
 trap 'unmount_tmpfs; die "Manually aborted!" -n' SIGINT SIGTERM
@@ -867,3 +890,4 @@ install_gcc
 package_tc
 ending_info
 push_sources
+push_logs
