@@ -797,13 +797,13 @@ function push_sources()
         cp -r ../${TARGET}/* .
         git checkout README.md && git add .
         if [ "${TARBALLS}" == false ]; then
-        git commit -m "toolchain: Update to ${DATE} build
+        git commit -am "toolchain: Update to ${DATE} build
 
 GCC VERSION: $(/drone/src/${TARGET}/bin/${TARGET}-gcc --version | head -n 1)
 GCC COMMIT URL: https://github.com/gcc-mirror/gcc/commit/${GCC_HEAD_COMMIT}
 BUILDER COMMIT: ${BUILDER_COMMIT}" && git push
         elif [ "${TARBALLS}" == true ]; then
-        git commit -m "toolchain: Update to ${DATE} build
+        git commit -am "toolchain: Update to ${DATE} build
 
 GCC VERSION: $(/drone/src/${TARGET}/bin/${TARGET}-gcc --version | head -n 1)
 BUILDER COMMIT: ${BUILDER_COMMIT}" && git push
@@ -815,13 +815,13 @@ BUILDER COMMIT: ${BUILDER_COMMIT}" && git push
         cp -r ../${TARGET}/* .
         git checkout README.md && git add .
         if [ "${TARBALLS}" == false ]; then
-        git commit -m "toolchain: Update to ${DATE} build
+        git commit -am "toolchain: Update to ${DATE} build
 
 GCC VERSION: $(/drone/src/${TARGET}/bin/${TARGET}-gcc --version | head -n 1)
 GCC COMMIT URL: https://github.com/gcc-mirror/gcc/commit/${GCC_HEAD_COMMIT}
 BUILDER COMMIT: ${BUILDER_COMMIT}" && git push
         elif [ "${TARBALLS}" == true ]; then
-        git commit -m "toolchain: Update to ${DATE} build
+        git commit -am "toolchain: Update to ${DATE} build
 
 GCC VERSION: $(/drone/src/${TARGET}/bin/${TARGET}-gcc --version | head -n 1)
 BUILDER COMMIT: ${BUILDER_COMMIT}" && git push
@@ -833,13 +833,13 @@ BUILDER COMMIT: ${BUILDER_COMMIT}" && git push
         cp -r ../${TARGET}/* .
         git checkout README.md && git add .
         if [ "${TARBALLS}" == false ]; then
-        git commit -m "toolchain: Update to ${DATE} build
+        git commit -am "toolchain: Update to ${DATE} build
 
 GCC VERSION: $(/drone/src/${TARGET}/bin/${TARGET}-gcc --version | head -n 1)
 GCC COMMIT URL: https://github.com/gcc-mirror/gcc/commit/${GCC_HEAD_COMMIT}
 BUILDER COMMIT: ${BUILDER_COMMIT}" && git push
         elif [ "${TARBALLS}" == true ]; then
-        git commit -m "toolchain: Update to ${DATE} build
+        git commit -am "toolchain: Update to ${DATE} build
 
 GCC VERSION: $(/drone/src/${TARGET}/bin/${TARGET}-gcc --version | head -n 1)
 BUILDER COMMIT: ${BUILDER_COMMIT}" && git push
