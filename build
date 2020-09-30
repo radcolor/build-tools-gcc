@@ -785,7 +785,7 @@ function push_sources()
     DATE="$(date "+%B %-d, %Y")"
     BUILDER_COMMIT="$(git rev-parse HEAD)"
     if [ ${TARGET} == "arm-linux-gnueabi" ]; then
-        git clone "https://theradcolor:${GITHUB_TOKEN}@github.com/theradcolor/arm-linux-gnueabi" upstream
+        git clone "https://theradcolor:${GITHUB_TOKEN}@github.com/theradcolor/arm-linux-gnueabi" -b stable-gcc upstream
         cd upstream || exit
         rm -rf *
         cp -r ../${TARGET}/* .
@@ -801,7 +801,7 @@ BUILDER COMMIT: ${BUILDER_COMMIT}" && git push
 BUILDER COMMIT: ${BUILDER_COMMIT}" && git push
         fi
     elif [ ${TARGET} == "aarch64-linux-gnu" ]; then
-        git clone "https://theradcolor:${GITHUB_TOKEN}@github.com/theradcolor/aarch64-linux-gnu" upstream
+        git clone "https://theradcolor:${GITHUB_TOKEN}@github.com/theradcolor/aarch64-linux-gnu" -b stable-gcc upstream
         cd upstream || exit
         rm -rf *
         cp -r ../${TARGET}/* .
@@ -817,7 +817,7 @@ BUILDER COMMIT: ${BUILDER_COMMIT}" && git push
 BUILDER COMMIT: ${BUILDER_COMMIT}" && git push
         fi
     elif [ ${TARGET} == "x86_64-linux-gnu" ]; then
-        git clone "https://theradcolor:${GITHUB_TOKEN}@github.com/theradcolor/x86_64-linux-gnu" upstream
+        git clone "https://theradcolor:${GITHUB_TOKEN}@github.com/theradcolor/x86_64-linux-gnu" -b stable-gcc upstream
         cd upstream || exit
         rm -rf *
         cp -r ../${TARGET}/* .
