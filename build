@@ -82,6 +82,7 @@ function die() {
     echo "${RED}${1}${RST}"
     [[ "${*}" =~ "-n" ]] && echo
     [[ "${*}" =~ "-h" ]] && help_menu
+    push_logs
     exit
 }
 
@@ -201,6 +202,9 @@ function setup_variables() {
     GLIBC_git="master"
     GLIBC_tar="glibc-2.32"
     LINUX="5.8"
+
+    # Timezone
+    export TZ=Asia/Kolkata
 
     # Start of script
     START=$(date +%s)
@@ -764,13 +768,9 @@ function ending_info() {
         header "BUILD SUCCESSFUL" ${VERBOSE:-"--no-first-echo"}
         echo "${BOLD}Script duration:${RST} $(format_time "${START}" "${END}")"
         echo "${BOLD}GCC version:${RST} $(${TARGET}/bin/${TARGET}-gcc --version | head -n 1)"
-        
-        # Only if we not using tarballs
-        if [ "${TARBALLS}" == false ]; then
-            GCC_HEAD_COMMIT=$(cd sources/gcc/ && git rev-parse HEAD)
-            echo "${BOLD}GCC COMMIT HEAD:${RST} ${GCC_HEAD_COMMIT}"
-            cd ../..
-        fi
+
+        GCC_HEAD_COMMIT=$(cd /drone/src/builder/sources/gcc/ && git rev-parse HEAD)
+        echo "${BOLD}GCC COMMIT HEAD:${RST} ${GCC_HEAD_COMMIT}"
         
         if [[ -n ${COMPRESSION} ]] && [[ -e ${PACKAGE} ]]; then
             echo "${BOLD}File location:${RST} $(pwd)/${PACKAGE}"
@@ -788,7 +788,7 @@ function ending_info() {
 
 function push_sources()
 {
-    DATE="$(date "+%B %-d, %Y")"
+    DATE="$(date +%d%m%Y)"
     BUILDER_COMMIT="$(git rev-parse HEAD)"
     if [ ${TARGET} == "arm-linux-gnueabi" ]; then
         git clone "https://theradcolor:${GITHUB_TOKEN}@github.com/theradcolor/arm-linux-gnueabi" upstream
@@ -796,16 +796,16 @@ function push_sources()
         rm -rf *
         cp -r ../${TARGET}/* .
         git checkout README.md && git add .
-        if [ "${TARBALLS}" == false ]; then
-        git commit -am "toolchain: Update to ${DATE} build
+        if [ "${TARBALLS}" == true ]; then
+        git commit -am "Update to https://github.com/gcc-mirror/gcc/commit/${GCC_HEAD_COMMIT}, ${DATE} build.
 
-GCC VERSION: $(/drone/src/${TARGET}/bin/${TARGET}-gcc --version | head -n 1)
-GCC COMMIT URL: https://github.com/gcc-mirror/gcc/commit/${GCC_HEAD_COMMIT}
+GCC VERSION: $(/drone/src/builder/${TARGET}/bin/${TARGET}-gcc --version | head -n 1)
 BUILDER COMMIT: ${BUILDER_COMMIT}" && git push
-        elif [ "${TARBALLS}" == true ]; then
-        git commit -am "toolchain: Update to ${DATE} build
+        else
+        git commit -am "Update to https://github.com/gcc-mirror/gcc/commit/${GCC_HEAD_COMMIT}, ${DATE} build.
 
-GCC VERSION: $(/drone/src/${TARGET}/bin/${TARGET}-gcc --version | head -n 1)
+GCC VERSION: $(/drone/src/builder/${TARGET}/bin/${TARGET}-gcc --version | head -n 1)
+GCC COMMIT URL: https://github.com/gcc-mirror/gcc/commit/${GCC_HEAD_COMMIT}
 BUILDER COMMIT: ${BUILDER_COMMIT}" && git push
         fi
     elif [ ${TARGET} == "aarch64-linux-gnu" ]; then
@@ -814,16 +814,16 @@ BUILDER COMMIT: ${BUILDER_COMMIT}" && git push
         rm -rf *
         cp -r ../${TARGET}/* .
         git checkout README.md && git add .
-        if [ "${TARBALLS}" == false ]; then
-        git commit -am "toolchain: Update to ${DATE} build
+        if [ "${TARBALLS}" == true ]; then
+        git commit -am "Update to https://github.com/gcc-mirror/gcc/commit/${GCC_HEAD_COMMIT}, ${DATE} build.
 
-GCC VERSION: $(/drone/src/${TARGET}/bin/${TARGET}-gcc --version | head -n 1)
-GCC COMMIT URL: https://github.com/gcc-mirror/gcc/commit/${GCC_HEAD_COMMIT}
+GCC VERSION: $(/drone/src/builder/${TARGET}/bin/${TARGET}-gcc --version | head -n 1)
 BUILDER COMMIT: ${BUILDER_COMMIT}" && git push
-        elif [ "${TARBALLS}" == true ]; then
-        git commit -am "toolchain: Update to ${DATE} build
+        else
+        git commit -am "Update to https://github.com/gcc-mirror/gcc/commit/${GCC_HEAD_COMMIT}, ${DATE} build.
 
-GCC VERSION: $(/drone/src/${TARGET}/bin/${TARGET}-gcc --version | head -n 1)
+GCC VERSION: $(/drone/src/builder/${TARGET}/bin/${TARGET}-gcc --version | head -n 1)
+GCC COMMIT URL: https://github.com/gcc-mirror/gcc/commit/${GCC_HEAD_COMMIT}
 BUILDER COMMIT: ${BUILDER_COMMIT}" && git push
         fi
     elif [ ${TARGET} == "x86_64-linux-gnu" ]; then
@@ -832,16 +832,16 @@ BUILDER COMMIT: ${BUILDER_COMMIT}" && git push
         rm -rf *
         cp -r ../${TARGET}/* .
         git checkout README.md && git add .
-        if [ "${TARBALLS}" == false ]; then
-        git commit -am "toolchain: Update to ${DATE} build
+        if [ "${TARBALLS}" == true ]; then
+        git commit -am "Update to https://github.com/gcc-mirror/gcc/commit/${GCC_HEAD_COMMIT}, ${DATE} build.
 
-GCC VERSION: $(/drone/src/${TARGET}/bin/${TARGET}-gcc --version | head -n 1)
-GCC COMMIT URL: https://github.com/gcc-mirror/gcc/commit/${GCC_HEAD_COMMIT}
+GCC VERSION: $(/drone/src/builder/${TARGET}/bin/${TARGET}-gcc --version | head -n 1)
 BUILDER COMMIT: ${BUILDER_COMMIT}" && git push
-        elif [ "${TARBALLS}" == true ]; then
-        git commit -am "toolchain: Update to ${DATE} build
+        else
+        git commit -am "Update to https://github.com/gcc-mirror/gcc/commit/${GCC_HEAD_COMMIT}, ${DATE} build.
 
-GCC VERSION: $(/drone/src/${TARGET}/bin/${TARGET}-gcc --version | head -n 1)
+GCC VERSION: $(/drone/src/builder/${TARGET}/bin/${TARGET}-gcc --version | head -n 1)
+GCC COMMIT URL: https://github.com/gcc-mirror/gcc/commit/${GCC_HEAD_COMMIT}
 BUILDER COMMIT: ${BUILDER_COMMIT}" && git push
         fi
     else

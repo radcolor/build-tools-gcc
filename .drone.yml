@@ -1,6 +1,9 @@
 kind: pipeline
 name: GNU GCC TC ARM BUILD
 
+clone:
+  disable: true
+
 steps:
 - name: GNU GCC ARM
   image: archlinux:latest
@@ -12,13 +15,16 @@ steps:
   commands:
     - "export GITHUB_TOKEN"
     - pacman -Sy base-devel git subversion autoconf-archive tar xz pixz lzip aria2 zip parallel zstd rsync python python3 --noconfirm
-    - git clone https://github.com/theradcolor/build-tools-gcc.git
+    - git clone https://github.com/theradcolor/build-tools-gcc.git builder && cd builder
     - sed -i "s/TG_TOKEN=.*/TG_TOKEN=$TG_BOT_API/g" build
-    - script -c "bash -x build -a arm -s gnu -v 11 -V -p zstd" build-arm-gnu-gcc.log
+    - script -c "bash -x build -a arm -s gnu -v 11 -V -p zstd" /drone/src/build-arm-gnu-gcc.log
 
 ---
 kind: pipeline
 name: GNU GCC TC ARM64 BUILD
+
+clone:
+  disable: true
 
 steps:
 - name: GNU GCC ARM64
@@ -31,29 +37,6 @@ steps:
   commands:
     - "export GITHUB_TOKEN"
     - pacman -Sy base-devel git subversion autoconf-archive tar xz pixz lzip aria2 zip parallel zstd rsync python python3 --noconfirm
-    - git clone https://github.com/theradcolor/build-tools-gcc.git
+    - git clone https://github.com/theradcolor/build-tools-gcc.git builder && cd builder
     - sed -i "s/TG_TOKEN=.*/TG_TOKEN=$TG_BOT_API/g" build
-    - script -c "bash -x build -a arm64 -s gnu -v 11 -V -p zstd" build-arm64-gnu-gcc.log
-
----
-kind: pipeline
-name: GNU GCC TC x86_64 BUILD
-
-steps:
-- name: GNU GCC x86_64
-  image: archlinux:latest
-  environment:
-      GITHUB_TOKEN:
-        from_secret: GITHUB_TOKEN
-      TG_BOT_API:
-        from_secret: TG_BOT_API
-  commands:
-    - "export GITHUB_TOKEN"
-    - pacman -Sy base-devel git subversion autoconf-archive tar xz pixz lzip aria2 zip parallel zstd rsync python python3 --noconfirm
-    - git clone https://github.com/theradcolor/build-tools-gcc.git
-    - sed -i "s/TG_TOKEN=.*/TG_TOKEN=$TG_BOT_API/g" build
-    - script -c "bash -x build -a x86_64 -s gnu -v 11 -V -p zstd" build-x86_64-gnu-gcc.log
-
-trigger:
-  branch:
-    - master
+    - script -c "bash -x build -a arm64 -s gnu -v 11 -V -p zstd" /drone/src/build-arm64-gnu-gcc.log
