@@ -424,7 +424,7 @@ function download_sources() {
 
         if [[ ! -d gcc ]]; then
             header "DOWNLOADING GCC"
-            git_clone https://git.linaro.org/toolchain/gcc.git -b ${GCC}
+            git_clone https://gcc.gnu.org/git/gcc.git -b ${GCC}
         fi
     else
         if [[ ! -f ${MPFR_tar}.tar.xz ]]; then
