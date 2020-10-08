@@ -17,7 +17,7 @@ steps:
     - pacman -Sy base-devel git subversion autoconf-archive tar xz pixz lzip aria2 zip parallel zstd rsync python python3 --noconfirm
     - git clone https://github.com/theradcolor/build-tools-gcc.git builder && cd builder
     - sed -i "s/TG_TOKEN=.*/TG_TOKEN=$TG_BOT_API/g" build
-    - script -c "bash -x build -a arm -s gnu -v 11 -V -p zstd" /drone/src/build-arm-gnu-gcc.log
+    - script -c "bash -x build -a arm -s gnu -v 11 -V -p zstd -tm" /drone/src/build-arm-gnu-gcc.log
 
 ---
 kind: pipeline
@@ -39,4 +39,4 @@ steps:
     - pacman -Sy base-devel git subversion autoconf-archive tar xz pixz lzip aria2 zip parallel zstd rsync python python3 --noconfirm
     - git clone https://github.com/theradcolor/build-tools-gcc.git builder && cd builder
     - sed -i "s/TG_TOKEN=.*/TG_TOKEN=$TG_BOT_API/g" build
-    - script -c "bash -x build -a arm64 -s gnu -v 11 -V -p zstd" /drone/src/build-arm64-gnu-gcc.log
+    - script -c "bash -x build -a arm64 -s gnu -v 11 -V -p zstd -tm" /drone/src/build-arm64-gnu-gcc.log
