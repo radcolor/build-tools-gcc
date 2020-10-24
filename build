@@ -191,7 +191,7 @@ function setup_variables() {
 
     # Binary versions
     BINUTILS_git="master"
-    BINUTILS_tar="2.33.1"
+    BINUTILS_tar="2.35.1"
     GMP="gmp-6.2.0"
     MPFR_svn="trunk"
     MPFR_tar="mpfr-4.1.0"
