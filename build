@@ -786,6 +786,22 @@ function ending_info() {
     echo "\a"
 }
 
+function push_tg_info()
+{
+    HEAD_COMMIT=$(git log -n 1 --pretty=format:%H)
+    GIT_URL="https://github.com/theradcolor/${TARGET}/commit/${HEAD_COMMIT}"
+
+    if [ "${TARBALLS}" == true ]; then
+       curl -s -X POST https://api.telegram.org/bot${TG_BOT_API}/sendMessage?chat_id=${CHANNEL_ID} \
+       -d "disable_web_page_preview=true" \
+       -d "parse_mode=markdown&text=⚒️ New commit to ${TARGET}:stable"$'\n\n'"[$(echo ${HEAD_COMMIT} | cut -c1-8)](${GIT_URL}): ${COMMIT_MSG}"
+    else
+       curl -s -X POST https://api.telegram.org/bot${TG_BOT_API}/sendMessage?chat_id=${CHANNEL_ID} \
+       -d "disable_web_page_preview=true" \
+       -d "parse_mode=markdown&text=⚒️ New commit to ${TARGET}:master"$'\n\n'"[$(echo ${HEAD_COMMIT} | cut -c1-8)](${GIT_URL}): ${COMMIT_MSG}"
+    fi
+}
+
 function push_sources()
 {
     DATE="$(date +%d%m%Y)"
@@ -800,13 +816,13 @@ function push_sources()
         git commit -am "Update to https://github.com/gcc-mirror/gcc/commit/${GCC_HEAD_COMMIT}, ${DATE} build.
 
 GCC VERSION: $(/drone/src/builder/${TARGET}/bin/${TARGET}-gcc --version | head -n 1)
-BUILDER COMMIT: ${BUILDER_COMMIT}" && git push
+BUILDER COMMIT: ${BUILDER_COMMIT}" && git push && COMMIT_MSG=$(git log -1 --pretty=%B) && push_tg_info
         else
         git commit -am "Update to https://github.com/gcc-mirror/gcc/commit/${GCC_HEAD_COMMIT}, ${DATE} build.
 
 GCC VERSION: $(/drone/src/builder/${TARGET}/bin/${TARGET}-gcc --version | head -n 1)
 GCC COMMIT URL: https://github.com/gcc-mirror/gcc/commit/${GCC_HEAD_COMMIT}
-BUILDER COMMIT: ${BUILDER_COMMIT}" && git push
+BUILDER COMMIT: ${BUILDER_COMMIT}" && git push && COMMIT_MSG=$(git log -1 --pretty=%B) && push_tg_info
         fi
     elif [ ${TARGET} == "aarch64-linux-gnu" ]; then
         git clone "https://theradcolor:${GITHUB_TOKEN}@github.com/theradcolor/aarch64-linux-gnu" upstream
@@ -818,13 +834,13 @@ BUILDER COMMIT: ${BUILDER_COMMIT}" && git push
         git commit -am "Update to https://github.com/gcc-mirror/gcc/commit/${GCC_HEAD_COMMIT}, ${DATE} build.
 
 GCC VERSION: $(/drone/src/builder/${TARGET}/bin/${TARGET}-gcc --version | head -n 1)
-BUILDER COMMIT: ${BUILDER_COMMIT}" && git push
+BUILDER COMMIT: ${BUILDER_COMMIT}" && git push && COMMIT_MSG=$(git log -1 --pretty=%B) && push_tg_info
         else
         git commit -am "Update to https://github.com/gcc-mirror/gcc/commit/${GCC_HEAD_COMMIT}, ${DATE} build.
 
 GCC VERSION: $(/drone/src/builder/${TARGET}/bin/${TARGET}-gcc --version | head -n 1)
 GCC COMMIT URL: https://github.com/gcc-mirror/gcc/commit/${GCC_HEAD_COMMIT}
-BUILDER COMMIT: ${BUILDER_COMMIT}" && git push
+BUILDER COMMIT: ${BUILDER_COMMIT}" && git push && COMMIT_MSG=$(git log -1 --pretty=%B) && push_tg_info
         fi
     elif [ ${TARGET} == "x86_64-linux-gnu" ]; then
         git clone "https://theradcolor:${GITHUB_TOKEN}@github.com/theradcolor/x86_64-linux-gnu" upstream
@@ -836,13 +852,13 @@ BUILDER COMMIT: ${BUILDER_COMMIT}" && git push
         git commit -am "Update to https://github.com/gcc-mirror/gcc/commit/${GCC_HEAD_COMMIT}, ${DATE} build.
 
 GCC VERSION: $(/drone/src/builder/${TARGET}/bin/${TARGET}-gcc --version | head -n 1)
-BUILDER COMMIT: ${BUILDER_COMMIT}" && git push
+BUILDER COMMIT: ${BUILDER_COMMIT}" && git push && COMMIT_MSG=$(git log -1 --pretty=%B) && push_tg_info
         else
         git commit -am "Update to https://github.com/gcc-mirror/gcc/commit/${GCC_HEAD_COMMIT}, ${DATE} build.
 
 GCC VERSION: $(/drone/src/builder/${TARGET}/bin/${TARGET}-gcc --version | head -n 1)
 GCC COMMIT URL: https://github.com/gcc-mirror/gcc/commit/${GCC_HEAD_COMMIT}
-BUILDER COMMIT: ${BUILDER_COMMIT}" && git push
+BUILDER COMMIT: ${BUILDER_COMMIT}" && git push && COMMIT_MSG=$(git log -1 --pretty=%B) && push_tg_info
         fi
     else
         echo "Skipping push!"
@@ -851,9 +867,6 @@ BUILDER COMMIT: ${BUILDER_COMMIT}" && git push
 
 function push_logs()
 {
-    TG_TOKEN="123:xyz"
-    CHAT_ID="-1001375712567"
-
     if [ ${TARGET} == "arm-linux-gnueabi" ]; then
         LOG="/drone/src/build-arm-gnu-gcc.log"
     elif [ ${TARGET} == "aarch64-linux-gnu" ]; then
@@ -864,12 +877,11 @@ function push_logs()
         echo "No scripting"
     fi
 
-	curl -F document=@"${LOG}" "https://api.telegram.org/bot${TG_TOKEN}/sendDocument" \
+	curl -F document=@"${LOG}" "https://api.telegram.org/bot${TG_BOT_API}/sendDocument" \
 		-F chat_id="${CHAT_ID}" \
 		-F "disable_web_page_preview=false" \
 		-F "parse_mode=html" \
         -F caption="Build logs GCC for Target: ${TARGET}"
-
 }
 
 setup_variables

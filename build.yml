@@ -12,11 +12,14 @@ steps:
         from_secret: GITHUB_TOKEN
       TG_BOT_API:
         from_secret: TG_BOT_API
+      CHAT_ID:
+        from_secret: CHAT_ID
+      CHANNEL_ID:
+        from_secret: CHANNEL_ID
   commands:
     - "export GITHUB_TOKEN"
-    - pacman -Sy base-devel git subversion autoconf-archive tar xz pixz lzip aria2 zip parallel zstd rsync python python3 --noconfirm
+    - pacman -Sy base-devel git curl subversion autoconf-archive tar xz pixz lzip aria2 zip parallel zstd rsync python python3 --noconfirm
     - git clone https://github.com/theradcolor/build-tools-gcc.git builder && cd builder
-    - sed -i "s/TG_TOKEN=.*/TG_TOKEN=$TG_BOT_API/g" build
     - script -c "bash -x build -a arm -s gnu -v 11 -V -p zstd -tm" /drone/src/build-arm-gnu-gcc.log
 
 ---
@@ -34,9 +37,12 @@ steps:
         from_secret: GITHUB_TOKEN
       TG_BOT_API:
         from_secret: TG_BOT_API
+      CHAT_ID:
+        from_secret: CHAT_ID
+      CHANNEL_ID:
+        from_secret: CHANNEL_ID
   commands:
     - "export GITHUB_TOKEN"
-    - pacman -Sy base-devel git subversion autoconf-archive tar xz pixz lzip aria2 zip parallel zstd rsync python python3 --noconfirm
+    - pacman -Sy base-devel git curl subversion autoconf-archive tar xz pixz lzip aria2 zip parallel zstd rsync python python3 --noconfirm
     - git clone https://github.com/theradcolor/build-tools-gcc.git builder && cd builder
-    - sed -i "s/TG_TOKEN=.*/TG_TOKEN=$TG_BOT_API/g" build
     - script -c "bash -x build -a arm64 -s gnu -v 11 -V -p zstd -tm" /drone/src/build-arm64-gnu-gcc.log
