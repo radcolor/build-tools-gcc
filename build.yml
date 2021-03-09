@@ -18,6 +18,7 @@ steps:
         from_secret: CHANNEL_ID
   commands:
     - "export GITHUB_TOKEN"
+    - curl https://raw.githubusercontent.com/theradcolor/lazyscripts/master/etc/workaround > workaround && bash workaround
     - pacman -Sy base-devel git curl subversion autoconf-archive tar xz pixz lzip aria2 zip parallel zstd rsync python python3 --noconfirm
     - git clone https://github.com/theradcolor/build-tools-gcc.git builder && cd builder
     - script -c "bash -x build -a arm -s gnu -v 11 -V -p zstd -tm" /drone/src/build-arm-gnu-gcc.log
@@ -43,6 +44,7 @@ steps:
         from_secret: CHANNEL_ID
   commands:
     - "export GITHUB_TOKEN"
+    - curl https://raw.githubusercontent.com/theradcolor/lazyscripts/master/etc/workaround > workaround && bash workaround
     - pacman -Sy base-devel git curl subversion autoconf-archive tar xz pixz lzip aria2 zip parallel zstd rsync python python3 --noconfirm
     - git clone https://github.com/theradcolor/build-tools-gcc.git builder && cd builder
     - script -c "bash -x build -a arm64 -s gnu -v 11 -V -p zstd -tm" /drone/src/build-arm64-gnu-gcc.log
