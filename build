@@ -813,15 +813,15 @@ function push_sources()
         cp -r ../${TARGET}/* .
         git checkout README.md && git add .
         if [ "${TARBALLS}" == true ]; then
-        git commit -am "Update to https://github.com/gcc-mirror/gcc/commit/${GCC_HEAD_COMMIT}, ${DATE} build.
+        git commit -am "Update to https://gcc.gnu.org/git/?p=gcc.git;a=commit;h=${GCC_HEAD_COMMIT}, ${DATE} build.
 
 GCC VERSION: $(/drone/src/builder/${TARGET}/bin/${TARGET}-gcc --version | head -n 1)
 BUILDER COMMIT: ${BUILDER_COMMIT}" && git push && COMMIT_MSG=$(git log -1 --pretty=%B) && push_tg_info
         else
-        git commit -am "Update to https://github.com/gcc-mirror/gcc/commit/${GCC_HEAD_COMMIT}, ${DATE} build.
+        git commit -am "Update to https://gcc.gnu.org/git/?p=gcc.git;a=commit;h=${GCC_HEAD_COMMIT}, ${DATE} build.
 
 GCC VERSION: $(/drone/src/builder/${TARGET}/bin/${TARGET}-gcc --version | head -n 1)
-GCC COMMIT URL: https://github.com/gcc-mirror/gcc/commit/${GCC_HEAD_COMMIT}
+GCC COMMIT URL: https://gcc.gnu.org/git/?p=gcc.git;a=commit;h=${GCC_HEAD_COMMIT}
 BUILDER COMMIT: ${BUILDER_COMMIT}" && git push && COMMIT_MSG=$(git log -1 --pretty=%B) && push_tg_info
         fi
     elif [ ${TARGET} == "aarch64-linux-gnu" ]; then
@@ -831,15 +831,15 @@ BUILDER COMMIT: ${BUILDER_COMMIT}" && git push && COMMIT_MSG=$(git log -1 --pret
         cp -r ../${TARGET}/* .
         git checkout README.md && git add .
         if [ "${TARBALLS}" == true ]; then
-        git commit -am "Update to https://github.com/gcc-mirror/gcc/commit/${GCC_HEAD_COMMIT}, ${DATE} build.
+        git commit -am "Update to https://gcc.gnu.org/git/?p=gcc.git;a=commit;h=${GCC_HEAD_COMMIT}, ${DATE} build.
 
 GCC VERSION: $(/drone/src/builder/${TARGET}/bin/${TARGET}-gcc --version | head -n 1)
 BUILDER COMMIT: ${BUILDER_COMMIT}" && git push && COMMIT_MSG=$(git log -1 --pretty=%B) && push_tg_info
         else
-        git commit -am "Update to https://github.com/gcc-mirror/gcc/commit/${GCC_HEAD_COMMIT}, ${DATE} build.
+        git commit -am "Update to https://gcc.gnu.org/git/?p=gcc.git;a=commit;h=${GCC_HEAD_COMMIT}, ${DATE} build.
 
 GCC VERSION: $(/drone/src/builder/${TARGET}/bin/${TARGET}-gcc --version | head -n 1)
-GCC COMMIT URL: https://github.com/gcc-mirror/gcc/commit/${GCC_HEAD_COMMIT}
+GCC COMMIT URL: https://gcc.gnu.org/git/?p=gcc.git;a=commit;h=${GCC_HEAD_COMMIT}
 BUILDER COMMIT: ${BUILDER_COMMIT}" && git push && COMMIT_MSG=$(git log -1 --pretty=%B) && push_tg_info
         fi
     elif [ ${TARGET} == "x86_64-linux-gnu" ]; then
@@ -849,15 +849,15 @@ BUILDER COMMIT: ${BUILDER_COMMIT}" && git push && COMMIT_MSG=$(git log -1 --pret
         cp -r ../${TARGET}/* .
         git checkout README.md && git add .
         if [ "${TARBALLS}" == true ]; then
-        git commit -am "Update to https://github.com/gcc-mirror/gcc/commit/${GCC_HEAD_COMMIT}, ${DATE} build.
+        git commit -am "Update to https://gcc.gnu.org/git/?p=gcc.git;a=commit;h=${GCC_HEAD_COMMIT}, ${DATE} build.
 
 GCC VERSION: $(/drone/src/builder/${TARGET}/bin/${TARGET}-gcc --version | head -n 1)
 BUILDER COMMIT: ${BUILDER_COMMIT}" && git push && COMMIT_MSG=$(git log -1 --pretty=%B) && push_tg_info
         else
-        git commit -am "Update to https://github.com/gcc-mirror/gcc/commit/${GCC_HEAD_COMMIT}, ${DATE} build.
+        git commit -am "Update to https://gcc.gnu.org/git/?p=gcc.git;a=commit;h=${GCC_HEAD_COMMIT}, ${DATE} build.
 
 GCC VERSION: $(/drone/src/builder/${TARGET}/bin/${TARGET}-gcc --version | head -n 1)
-GCC COMMIT URL: https://github.com/gcc-mirror/gcc/commit/${GCC_HEAD_COMMIT}
+GCC COMMIT URL: https://gcc.gnu.org/git/?p=gcc.git;a=commit;h=${GCC_HEAD_COMMIT}
 BUILDER COMMIT: ${BUILDER_COMMIT}" && git push && COMMIT_MSG=$(git log -1 --pretty=%B) && push_tg_info
         fi
     else
