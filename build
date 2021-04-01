@@ -201,7 +201,7 @@ function setup_variables() {
     ISL_tar="isl-0.23"
     GLIBC_git="master"
     GLIBC_tar="glibc-2.33"
-    LINUX="5.10"
+    LINUX="5.11"
 
     # Timezone
     export TZ=Asia/Kolkata
