@@ -200,7 +200,7 @@ function setup_variables() {
     ISL_git="master"
     ISL_tar="isl-0.23"
     GLIBC_git="master"
-    GLIBC_tar="glibc-2.32"
+    GLIBC_tar="glibc-2.33"
     LINUX="5.10"
 
     # Timezone
