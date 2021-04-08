@@ -53,6 +53,7 @@ function help_menu() {
     echo "  -v  | --version:     Possible values: (4, 5, 6, 7, 8, 9*, 10* and 11* [*GNU only]). This is the GCC version to build. If host is specified in ARCH, only version that matches or newer than the distribution one is allowed."
     echo
     echo "${BOLD}OPTIONAL PARAMETERS:${RST}"
+    echo "  -e  | --elf:         Make a bare metal / ELF toolchain, will automatically trigger -nl (--with-newlib) flag (Default No)."
     echo "  -f  | --full-src:    Download full git repos instead of shallow clones"
     echo "  -j  | --jobs:        Specify the amount of threads to use. This overrides the default detection"
     echo "  -nu | --no-update:   Do not update the downloaded components before building (useful if you have slow internet)."
@@ -231,6 +232,7 @@ function parse_parameters() {
             "-v"|"--version") shift && VERSION=${1} ;;
 
             # OPTIONAL FLAGS
+            "-e"|"--elf") BARE_METAL=true ;;
             "-f"|"--full-src") DEPTH_FLAG=false ;;
             "-j"|"--jobs") shift && JOBS=-j${1} ;;
             "-nu"|"--no-update") NO_UPDATE=true ;;
@@ -263,6 +265,24 @@ function parse_parameters() {
                   TARGET="x86_64-linux-gnu" ;;
         *) die "Absent or invalid arch specified!" -h ;;
     esac
+
+    # Override TARGET if BARE_METAL flag is parsed
+    if [[ ${BARE_METAL} == true ]]; then
+        if [[ ${TARGET} == "arm-linux-gnueabi" ]]; then
+            TARGET="arm-eabi"
+        fi
+        if [[ ${TARGET} == "aarch64-linux-gnu" ]]; then
+            TARGET="aarch64-elf"
+        fi
+        if [[ ${TARGET} == "i686-linux-gnu" ]]; then
+            TARGET="i686-elf"
+        fi
+        if [[ ${TARGET} == "x86_64-linux-gnu" ]]; then
+            TARGET="x86_64-elf"
+        fi
+        # Build with newlib instead of glibc
+        NEWLIB=true
+    fi
 
     # Kernel architecture; i686 and x86_64 targets use x86
     [[ ${ARCH} = "i686" || ${ARCH} = "x86_64" ]] && KERNEL_ARCH=x86 || KERNEL_ARCH=${ARCH}
