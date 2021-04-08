@@ -21,7 +21,7 @@ steps:
     - curl https://raw.githubusercontent.com/theradcolor/lazyscripts/master/etc/workaround > workaround && bash workaround
     - pacman -Sy base-devel git curl subversion autoconf-archive tar xz pixz lzip aria2 zip parallel zstd rsync python python3 --noconfirm
     - git clone https://github.com/theradcolor/build-tools-gcc.git builder && cd builder
-    - script -c "bash -x build -a arm -s gnu -v 11 -V -p zstd -tm" /drone/src/build-gnu-gcc-tc.log
+    - script -c "bash -x build -a arm -s gnu -v 11 -V -p zstd -r -tm" /drone/src/build-gnu-gcc-tc.log
 
 ---
 kind: pipeline
@@ -47,7 +47,7 @@ steps:
     - curl https://raw.githubusercontent.com/theradcolor/lazyscripts/master/etc/workaround > workaround && bash workaround
     - pacman -Sy base-devel git curl subversion autoconf-archive tar xz pixz lzip aria2 zip parallel zstd rsync python python3 --noconfirm
     - git clone https://github.com/theradcolor/build-tools-gcc.git builder && cd builder
-    - script -c "bash -x build -a arm --elf -s gnu -v 11 -V -p zstd -tm" /drone/src/build-gnu-gcc-tc.log
+    - script -c "bash -x build -a arm --elf -s gnu -v 11 -V -p zstd -r -tm" /drone/src/build-gnu-gcc-tc.log
 
 ---
 kind: pipeline
@@ -73,7 +73,7 @@ steps:
     - curl https://raw.githubusercontent.com/theradcolor/lazyscripts/master/etc/workaround > workaround && bash workaround
     - pacman -Sy base-devel git curl subversion autoconf-archive tar xz pixz lzip aria2 zip parallel zstd rsync python python3 --noconfirm
     - git clone https://github.com/theradcolor/build-tools-gcc.git builder && cd builder
-    - script -c "bash -x build -a arm64 -s gnu -v 11 -V -p zstd -tm" /drone/src/build-gnu-gcc-tc.log
+    - script -c "bash -x build -a arm64 -s gnu -v 11 -V -p zstd -r -tm" /drone/src/build-gnu-gcc-tc.log
 
 ---
 kind: pipeline
@@ -99,4 +99,4 @@ steps:
     - curl https://raw.githubusercontent.com/theradcolor/lazyscripts/master/etc/workaround > workaround && bash workaround
     - pacman -Sy base-devel git curl subversion autoconf-archive tar xz pixz lzip aria2 zip parallel zstd rsync python python3 --noconfirm
     - git clone https://github.com/theradcolor/build-tools-gcc.git builder && cd builder
-    - script -c "bash -x build -a arm64 --elf -s gnu -v 11 -V -p zstd -tm" /drone/src/build-gnu-gcc-tc.log
+    - script -c "bash -x build -a arm64 --elf -s gnu -v 11 -V -p zstd -r -tm" /drone/src/build-gnu-gcc-tc.log
