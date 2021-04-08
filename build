@@ -21,6 +21,7 @@
 # http://isl.gforge.inria.fr/
 # https://www.gnu.org/software/binutils/
 # https://www.gnu.org/software/libc/
+# https://sourceware.org/newlib/
 # https://www.kernel.org/
 # https://git.linaro.org/toolchain/gcc.git # linaro and gnu
 
@@ -55,6 +56,7 @@ function help_menu() {
     echo "  -f  | --full-src:    Download full git repos instead of shallow clones"
     echo "  -j  | --jobs:        Specify the amount of threads to use. This overrides the default detection"
     echo "  -nu | --no-update:   Do not update the downloaded components before building (useful if you have slow internet)."
+    echo "  -nl | --with-newlib: Use newlib instead of glic (Default no)."
     echo "  -p  | --package:     Possible values: gz, xz or zstd. Compresses toolchain after build."
     echo "  -tm | --tmpfs:       Use tmpfs for building (useful if you have much RAM)."
     echo "  -tr | --tarballs:    Use tarballs for binutils, MPFR, MPC, ISL, glibc, and, GCC"
@@ -152,7 +154,11 @@ function check_sudo() {
 
 # Unmount tmpfs
 function unmount_tmpfs() {
-    sudo umount -f build-glibc 2>/dev/null
+    if [[ ${NEWLIB} == true ]]; then
+       sudo umount -f build-newlib 2>/dev/null
+    else
+       sudo umount -f build-glibc 2>/dev/null
+    fi
     sudo umount -f build-gcc 2>/dev/null
     sudo umount -f build-binutils 2>/dev/null
 }
@@ -169,10 +175,12 @@ function git_fetch() {
     git fetch ${DEPTH_FLAG:+"--depth=1"} "${@}"
 }
 
+
 # aria2 wrapper
 function dl_file() {
     aria2c --split=16 --max-connection-per-server=16 --summary-interval=0 "${1:?}"
 }
+
 
 # Initial setup
 function setup_variables() {
@@ -201,6 +209,8 @@ function setup_variables() {
     ISL_tar="isl-0.23"
     GLIBC_git="master"
     GLIBC_tar="glibc-2.33"
+    NEWLIB_git="master"
+    NEWLIB_tar="newlib-4.1.0"
     LINUX="5.11"
 
     # Timezone
@@ -224,6 +234,7 @@ function parse_parameters() {
             "-f"|"--full-src") DEPTH_FLAG=false ;;
             "-j"|"--jobs") shift && JOBS=-j${1} ;;
             "-nu"|"--no-update") NO_UPDATE=true ;;
+            "-nl"|"--with-newlib") NEWLIB=true ;;
             "-p"|"--package") shift && COMPRESSION=${1} ;;
             "-tm"|"--tmpfs") TMPFS=true ;;
             "-tr"|"--tarballs") TARBALLS=true ;;
@@ -326,7 +337,7 @@ function parse_parameters() {
 function clean_up() { #FIXME: we dont need to remove everything everytime.
     header "CLEANING UP"
 
-    [[ -z ${TMPFS} ]] && { for i in binutils gcc glibc; do rm -rf build-$i/*; done; }
+    [[ -z ${TMPFS} ]] && { for i in binutils gcc glibc newlib; do rm -rf build-$i/*; done; }
     unmount_tmpfs
     git clean -fxdq -e sources -e prebuilts -e patches
     find . -maxdepth 1 -type l -exec rm -rf {} \; #FIXME
@@ -334,6 +345,7 @@ function clean_up() { #FIXME: we dont need to remove everything everytime.
        [[ -d build-binutils ]] ||
        [[ -d build-gcc ]] ||
        [[ -d build-glibc ]] ||
+       [[ -d build-newlib ]] ||
        [[ -d gcc ]] ||
        [[ -d linux ]] ||
        [[ -f ${TARGET} ]] ||
@@ -407,9 +419,16 @@ function download_sources() {
             git_clone https://scm.gforge.inria.fr/anonscm/git/mpc/mpc.git -b ${MPC_git}
         fi
 
-        if [[ ! -d glibc ]]; then
-            header "DOWNLOADING GLIBC"
-            git_clone git://sourceware.org/git/glibc.git -b ${GLIBC_git}
+        if [[ ${NEWLIB} == true ]]; then
+            if [[ ! -d newlib ]]; then
+               header "DOWNLOADING NEWLIB"
+               git_clone git://sourceware.org/git/newlib-cygwin.git -b ${NEWLIB_git} newlib
+            fi
+        else
+            if [[ ! -d glibc ]]; then
+               header "DOWNLOADING GLIBC"
+               git_clone git://sourceware.org/git/glibc.git -b ${GLIBC_git}
+            fi
         fi
 
         if [[ ! -d binutils ]]; then
@@ -437,9 +456,16 @@ function download_sources() {
             dl_file https://ftp.gnu.org/gnu/mpc/${MPC_tar}.tar.gz
         fi
 
-        if [[ ! -f ${GLIBC_tar}.tar.xz ]]; then
-            header "DOWNLOADING GLIBC ${GLIBC_tar} FOR GCC ${VERSION}"
-            dl_file https://ftp.gnu.org/gnu/glibc/${GLIBC_tar}.tar.xz
+        if [[ ${NEWLIB} == true ]]; then
+            if [[ ! -f ${NEWLIB_tar}.tar.gz ]]; then
+               header "DOWNLOADING NEWLIB ${NEWLIB_tar} FOR GCC ${VERSION}"
+               dl_file ftp://sourceware.org/pub/newlib/{NEWLIB_tar}.tar.gz
+            fi
+        else
+            if [[ ! -f ${GLIBC_tar}.tar.xz ]]; then
+               header "DOWNLOADING GLIBC ${GLIBC_tar} FOR GCC ${VERSION}"
+               dl_file https://ftp.gnu.org/gnu/glibc/${GLIBC_tar}.tar.xz
+            fi
         fi
 
         if [[ ! -f binutils-${BINUTILS_tar}.tar.xz ]]; then
@@ -493,7 +519,11 @@ function extract_sources() {
     if [[ -n ${TARBALLS} ]]; then
         extract ${MPFR_tar}.tar.xz ../${MPFR_tar}
         extract ${MPC_tar}.tar.gz ../${MPC_tar}
-        extract ${GLIBC_tar}.tar.xz ../${GLIBC_tar}
+        if [[ ${NEWLIB} == true ]]; then
+            extract ${NEWLIB_tar}.tar.gz ../${NEWLIB_tar}
+        else
+            extract ${GLIBC_tar}.tar.xz ../${GLIBC_tar}
+        fi
         extract binutils-${BINUTILS_tar}.tar.xz ../binutils
         extract ${ISL_tar}.tar.xz ../${ISL_tar}
         if [[ ${SOURCE} = "linaro" && ${VERSION} -ge 8 ]]; then
@@ -526,13 +556,23 @@ function update_repos() {
             git reset --hard ${BRANCH}
             autoreconf -i
         )
-        (
-            cd glibc || die "GLIBC did not get cloned properly!"
-            [[ -n ${FULL_SOURCE} ]] && BRANCH=origin/${GLIBC_git} || BRANCH=FETCH_HEAD
-            git_fetch origin ${GLIBC_git}
-            git checkout -f ${GLIBC_git} || git checkout -f -b ${GLIBC_git} ${BRANCH}
-            git reset --hard ${BRANCH}
-        )
+        if [[ ${NEWLIB} == true ]]; then
+            (
+                cd newlib || die "NEWLIB did not get cloned properly!"
+                [[ -n ${FULL_SOURCE} ]] && BRANCH=origin/${NEWLIB_git} || BRANCH=FETCH_HEAD
+                git_fetch origin ${NEWLIB_git}
+                git checkout -f ${NEWLIB_git} || git checkout -f -b ${NEWLIB_git} ${BRANCH}
+                git reset --hard ${BRANCH}
+            )
+        else
+            (
+                cd glibc || die "GLIBC did not get cloned properly!"
+                [[ -n ${FULL_SOURCE} ]] && BRANCH=origin/${GLIBC_git} || BRANCH=FETCH_HEAD
+                git_fetch origin ${GLIBC_git}
+                git checkout -f ${GLIBC_git} || git checkout -f -b ${GLIBC_git} ${BRANCH}
+                git reset --hard ${BRANCH}
+            )
+        fi
         (
             cd isl || die "ISL did not get cloned properly!"
             [[ -n ${FULL_SOURCE} ]] && BRANCH=origin/${ISL_git} || BRANCH=FETCH_HEAD
@@ -581,7 +621,12 @@ function update_repos() {
 
     [[ ! -d binutils ]] && ln -s sources/binutils binutils
     [[ ! -d gcc ]] && ln -s sources/gcc gcc
-    [[ ! -d glibc ]] && ln -s sources/glibc glibc
+    
+    if [[ ${NEWLIB} == true ]]; then
+        [[ ! -d newlib ]] && ln -s sources/newlib newlib
+    else
+        [[ ! -d glibc ]] && ln -s sources/glibc glibc
+    fi
 }
 
 
@@ -592,12 +637,21 @@ function setup_env() {
 
     [[ ! -d gcc ]] && die "GCC source is missing! Please check your connection and rerun the script!" -h
 
-    mkdir build-glibc
+    if [[ ${NEWLIB} == true ]]; then
+        mkdir build-newlib
+    else
+        mkdir build-glibc
+    fi
+
     mkdir build-gcc
     mkdir build-binutils
 
     if [[ -n ${TMPFS} ]]; then
-        sudo mount -t tmpfs -o rw none build-glibc
+        if [[ ${NEWLIB} == true ]]; then
+           sudo mount -t tmpfs -o rw none build-newlib
+        else
+           sudo mount -t tmpfs -o rw none build-glibc
+        fi
         sudo mount -t tmpfs -o rw none build-gcc
         sudo mount -t tmpfs -o rw none build-binutils
     else
@@ -675,10 +729,18 @@ function build_headers() {
 function build_gcc() {
     header "MAKING GCC"
     cd ../build-gcc || die "GCC build folder does not exist!"
-    ../gcc/configure --enable-languages=c,c++ \
+    if [[ ${NEWLIB} == true ]]; then
+        ../gcc/configure --enable-languages=c,c++ \
+                     --target=${TARGET} \
+                     --prefix="${INSTALL}" \
+                     --with-newlib \
+                     "${CONFIGURATION[@]}"
+    else
+        ../gcc/configure --enable-languages=c,c++ \
                      --target=${TARGET} \
                      --prefix="${INSTALL}" \
                      "${CONFIGURATION[@]}"
+    fi
     make all-gcc "${JOBS}" || die "Error while building gcc!" -n
     make install-gcc "${JOBS}" || die "Error while installing gcc!" -n
     if [[ ${ARCH} = "x86_64" ]]; then
@@ -717,6 +779,21 @@ function build_glibc() {
         make "${JOBS}" || die "Error while building glibc for target" -n
         make install "${JOBS}" || die "Error while installing glibc for target" -n
     fi
+}
+
+
+# Build newlib
+function build_newlib() {
+    header "MAKING NEWLIB"
+    cd ../build-newlib || die "newlib build folder does not exist!"
+    [[ -z ${TARBALLS} ]] && NEWLIB=newlib || NEWLIB=${NEWLIB_tar}
+    ../${NEWLIB}/configure --prefix="${INSTALL}" \
+                          --build=${MACHTYPE} \
+                          --host=${MACHTYPE} \
+                          --target=${TARGET}
+    cd ../build-newlib || die "newlib build folder does not exist!"
+    make "${JOBS}" || die "Error while building newlib for target" -n
+    make install "${JOBS}" || die "Error while installing newlib for target" -n
 }
 
 
@@ -867,7 +944,7 @@ BUILDER COMMIT: ${BUILDER_COMMIT}" && git push && COMMIT_MSG=$(git log -1 --pret
 
 function push_logs()
 {
-    if [ ${TARGET} == "arm-linux-gnueabi" ]; then
+    if [ ${TARGET} == "arm-eabi" ]; then
         LOG="/drone/src/build-arm-gnu-gcc.log"
     elif [ ${TARGET} == "aarch64-linux-gnu" ]; then
         LOG="/drone/src/build-arm64-gnu-gcc.log"
@@ -895,9 +972,17 @@ extract_sources
 update_repos
 setup_env
 build_binutils
-build_headers
+if [[ ${NEWLIB} == true ]]; then
+    echo "Skippung HEADERS"
+else
+    build_headers
+fi
 build_gcc
-build_glibc
+if [[ ${NEWLIB} == true ]]; then
+    build_newlib
+else
+    build_glibc
+fi
 install_gcc
 package_tc
 ending_info
