@@ -100,3 +100,55 @@ steps:
     - pacman -Sy base-devel git curl subversion autoconf-archive tar xz pixz lzip aria2 zip parallel zstd rsync python python3 --noconfirm
     - git clone https://github.com/theradcolor/build-tools-gcc.git builder && cd builder
     - script -c "bash -x build -a arm64 --elf -s gnu -v 11 -V -p zstd -r -tm" /drone/src/build-gnu-gcc-tc.log
+
+---
+kind: pipeline
+name: GNU GCC X86_64 NON ELF BUILD
+
+clone:
+  disable: true
+
+steps:
+- name: x86_64-linux-gnu
+  image: archlinux:latest
+  environment:
+      GITHUB_TOKEN:
+        from_secret: GITHUB_TOKEN
+      TG_BOT_API:
+        from_secret: TG_BOT_API
+      CHAT_ID:
+        from_secret: CHAT_ID
+      CHANNEL_ID:
+        from_secret: CHANNEL_ID
+  commands:
+    - "export GITHUB_TOKEN"
+    - curl https://raw.githubusercontent.com/theradcolor/lazyscripts/master/etc/workaround > workaround && bash workaround
+    - pacman -Sy base-devel git curl subversion autoconf-archive tar xz pixz lzip aria2 zip parallel zstd rsync python python3 --noconfirm
+    - git clone https://github.com/theradcolor/build-tools-gcc.git builder && cd builder
+    - script -c "bash -x build -a x86_64 -s gnu -v 11 -V -p zstd -tm" /drone/src/build-gnu-gcc-tc.log
+
+---
+kind: pipeline
+name: GNU GCC X86_64 BARE METAL / ELF
+
+clone:
+  disable: true
+
+steps:
+- name: x86_64-elf
+  image: archlinux:latest
+  environment:
+      GITHUB_TOKEN:
+        from_secret: GITHUB_TOKEN
+      TG_BOT_API:
+        from_secret: TG_BOT_API
+      CHAT_ID:
+        from_secret: CHAT_ID
+      CHANNEL_ID:
+        from_secret: CHANNEL_ID
+  commands:
+    - "export GITHUB_TOKEN"
+    - curl https://raw.githubusercontent.com/theradcolor/lazyscripts/master/etc/workaround > workaround && bash workaround
+    - pacman -Sy base-devel git curl subversion autoconf-archive tar xz pixz lzip aria2 zip parallel zstd rsync python python3 --noconfirm
+    - git clone https://github.com/theradcolor/build-tools-gcc.git builder && cd builder
+    - script -c "bash -x build -a x86_64 --elf -s gnu -v 11 -V -p zstd -tm" /drone/src/build-gnu-gcc-tc.log
