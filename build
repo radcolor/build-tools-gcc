@@ -730,7 +730,12 @@ function build_binutils() {
     ../binutils/configure --target=${TARGET} \
                           --prefix="${INSTALL}" \
                           --disable-gdb \
+                          --disable-nls \
                           --enable-gold \
+                          --enable-lto \
+                          --enable-plugins \
+                          --enable-relro \
+                          --with-sysroot \
                           "${CONFIGURATION[@]}"
     make "${JOBS}" || die "Error while building binutils!" -n
     make install "${JOBS}" || die "Error while installing binutils!" -n
@@ -755,12 +760,15 @@ function build_gcc() {
         ../gcc/configure --enable-languages=c,c++ \
                      --target=${TARGET} \
                      --prefix="${INSTALL}" \
+                     --disable-nls \
+                     --disable-shared \
                      --with-newlib \
                      "${CONFIGURATION[@]}"
     else
         ../gcc/configure --enable-languages=c,c++ \
                      --target=${TARGET} \
                      --prefix="${INSTALL}" \
+                     --disable-nls \
                      "${CONFIGURATION[@]}"
     fi
     make all-gcc "${JOBS}" || die "Error while building gcc!" -n
