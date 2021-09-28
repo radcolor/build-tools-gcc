@@ -1,0 +1,28 @@
+name: GNU GCC ARM64 BARE METAL / ELF
+
+on:
+  # Triggers the workflow on push or pull request events but only for the master branch
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: GNU GCC ARM64 BARE METAL / ELF
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y axel flex bison ncurses-dev texinfo gcc libtool automake binutils-dev bc autoconf build-essential pkg-config libmpc-dev libmpfr-dev lzip autopoint gettext txt2man libssl-dev wget
+          sudo timedatectl set-timezone Asia/Kolkata
+          script -c "bash -x build -a arm64 --elf -s gnu -v 11 -V -p zstd -r -tm" /home/runner/work/build-tools-gcc/build-tools-gcc/build-gnu-gcc-tc.log
+        env:
+          TG_BOT_API: ${{ secrets.TG_BOT_API }}
+          CHAT_ID: ${{ secrets.CHAT_ID }}
+          TOKEN_GITHUB: ${{ secrets.TOKEN_GITHUB }}
+          CHANNEL_ID: ${{ secrets.CHANNEL_ID }}
+          
