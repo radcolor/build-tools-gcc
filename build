@@ -168,13 +168,13 @@ function unmount_tmpfs() {
 
 # git clone wrapper
 function git_clone() {
-    git clone ${DEPTH_FLAG:+"--depth=1"} "${@}"
+    git clone --quiet ${DEPTH_FLAG:+"--depth=1"} "${@}"
 }
 
 
 # git fetch wrapper
 function git_fetch() {
-    git fetch ${DEPTH_FLAG:+"--depth=1"} "${@}"
+    git fetch --quiet ${DEPTH_FLAG:+"--depth=1"} "${@}"
 }
 
 
@@ -395,7 +395,7 @@ function build_binaries() {
 
     if [[ -z ${HAS_AXEL} && ! -f ${PREBUILTS_BIN}/txt2man ]]; then
         TXT2MAN=/tmp/sources/txt2man
-        [[ ! -d ${TXT2MAN} ]] && git clone --depth=1 https://github.com/mvertes/txt2man "${TXT2MAN}"
+        [[ ! -d ${TXT2MAN} ]] && git clone --quiet --depth=1 https://github.com/mvertes/txt2man "${TXT2MAN}"
         git -C "${TXT2MAN}" clean -fxdq
         git -C "${TXT2MAN}" pull
         (
@@ -408,7 +408,7 @@ function build_binaries() {
 
     if [[ ! -f ${PREBUILTS_BIN}/pigz ]]; then
         PIGZ=/tmp/sources/pigz
-        [[ ! -d ${PIGZ} ]] && git clone --depth=1 https://github.com/madler/pigz "${PIGZ}"
+        [[ ! -d ${PIGZ} ]] && git clone --quiet --depth=1 https://github.com/madler/pigz "${PIGZ}"
         git -C "${PIGZ}" clean -fxdq
         git -C "${PIGZ}" pull
         make -C "${PIGZ}" "${JOBS}" pigz || die "Error building pigz!"
@@ -876,7 +876,7 @@ function ending_info() {
         echo "${BOLD}Script duration:${RST} $(format_time "${START}" "${END}")"
         echo "${BOLD}GCC version:${RST} $(${TARGET}/bin/${TARGET}-gcc --version | head -n 1)"
 
-        GCC_HEAD_COMMIT=$(cd /drone/src/builder/sources/gcc/ && git rev-parse HEAD)
+        GCC_HEAD_COMMIT=$(cd /home/runner/work/build-tools-gcc/build-tools-gcc/sources/gcc/ && git rev-parse HEAD)
         echo "${BOLD}GCC COMMIT HEAD:${RST} ${GCC_HEAD_COMMIT}"
         
         if [[ -n ${COMPRESSION} ]] && [[ -e ${PACKAGE} ]]; then
@@ -915,20 +915,23 @@ function push_sources()
     DATE="$(date +%d%m%Y)"
     BUILDER_COMMIT="$(git rev-parse HEAD)"
 
+    git config --global user.name "Shashank Baghel"
+    git config --global user.email "theradcolor@gmail.com"
+
     # As our REPO_NAME == TARGET
-    git clone "https://theradcolor:${GITHUB_TOKEN}@github.com/theradcolor/${TARGET}" upstream && cd upstream
+    git clone --quiet "https://theradcolor:${TOKEN_GITHUB}@github.com/theradcolor/${TARGET}" upstream && cd upstream
     rm -rf *
     cp -r ../${TARGET}/* .
     git checkout README.md && git add .
 
     if [ "${TARBALLS}" == true ]; then
-    git commit -am "toolchain: Bump GCC version: $(/drone/src/builder/${TARGET}/bin/${TARGET}-gcc --version | head -n 1)
+    git commit -am "toolchain: Bump GCC version: $(/home/runner/work/build-tools-gcc/build-tools-gcc/${TARGET}/bin/${TARGET}-gcc --version | head -n 1)
 
 BUILDER COMMIT: ${BUILDER_COMMIT}" && git push && COMMIT_MSG=$(git log -1 --pretty=%B) && push_tg_info
     else
     git commit -am "Update to https://gcc.gnu.org/git/?p=gcc.git;a=commit;h=${GCC_HEAD_COMMIT}, ${DATE} build.
 
-GCC VERSION: $(/drone/src/builder/${TARGET}/bin/${TARGET}-gcc --version | head -n 1)
+GCC VERSION: $(/home/runner/work/build-tools-gcc/build-tools-gcc/${TARGET}/bin/${TARGET}-gcc --version | head -n 1)
 GCC COMMIT URL: https://gcc.gnu.org/git/?p=gcc.git;a=commit;h=${GCC_HEAD_COMMIT}
 BUILDER COMMIT: ${BUILDER_COMMIT}" && git push && COMMIT_MSG=$(git log -1 --pretty=%B) && push_tg_info
     fi
@@ -938,13 +941,13 @@ BUILDER COMMIT: ${BUILDER_COMMIT}" && git push && COMMIT_MSG=$(git log -1 --pret
 # Send Logs
 function push_logs()
 {
-    LOG="/drone/src/build-gnu-gcc-tc.log"
+    LOG="/home/runner/work/build-tools-gcc/build-tools-gcc/build-gnu-gcc-tc.log"
 
 	curl -F document=@"${LOG}" "https://api.telegram.org/bot${TG_BOT_API}/sendDocument" \
 		-F chat_id="${CHAT_ID}" \
 		-F "disable_web_page_preview=false" \
 		-F "parse_mode=html" \
-        -F caption="Build logs GCC for Target: ${TARGET}. GCC Version: $(/drone/src/builder/${TARGET}/bin/${TARGET}-gcc --version)"
+        -F caption="Build logs GCC for Target: ${TARGET}. GCC Version: $(/home/runner/work/build-tools-gcc/build-tools-gcc/${TARGET}/bin/${TARGET}-gcc --version | head -n 1)"
 }
 
 
