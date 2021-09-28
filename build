@@ -201,19 +201,19 @@ function setup_variables() {
 
     # Binary versions
     BINUTILS_git="master"
-    BINUTILS_tar="2.35.1"
+    BINUTILS_tar="2.37"
     GMP="gmp-6.2.1"
     MPFR_svn="trunk"
     MPFR_tar="mpfr-4.1.0"
     MPC_git="master"
     MPC_tar="mpc-1.2.1"
     ISL_git="master"
-    ISL_tar="isl-0.23"
+    ISL_tar="isl-0.24"
     GLIBC_git="master"
-    GLIBC_tar="glibc-2.33"
+    GLIBC_tar="glibc-2.34"
     NEWLIB_git="master"
     NEWLIB_tar="newlib-4.1.0"
-    LINUX="5.11"
+    LINUX="5.14"
 
     # Timezone
     export TZ=Asia/Kolkata
