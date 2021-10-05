@@ -1,11 +1,13 @@
 name: GNU GCC ARM NON ELF BUILD
 
 on:
-  # Triggers the workflow on push or pull request events but only for the master branch
+  # Triggers the workflow on push, pull and cron request events but only for the master branch
   push:
     branches: [ master ]
   pull_request:
     branches: [ master ]
+  schedule:
+    - cron: '0 12 * * 4'
 
 jobs:
   build:
