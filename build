@@ -895,7 +895,7 @@ function ending_info() {
 function push_tg_info()
 {
     HEAD_COMMIT=$(git log -n 1 --pretty=format:%H)
-    GIT_URL="https://github.com/theradcolor/${TARGET}/commit/${HEAD_COMMIT}"
+    GIT_URL="https://github.com/radcolor/${TARGET}/commit/${HEAD_COMMIT}"
 
     if [ "${TARBALLS}" == true ]; then
        curl -s -X POST https://api.telegram.org/bot${TG_BOT_API}/sendMessage?chat_id=${CHANNEL_ID} \
@@ -919,7 +919,7 @@ function push_sources()
     git config --global user.email "theradcolor@gmail.com"
 
     # As our REPO_NAME == TARGET
-    git clone --quiet "https://theradcolor:${TOKEN_GITHUB}@github.com/theradcolor/${TARGET}" upstream && cd upstream
+    git clone --quiet "https://radcolor:${TOKEN_GITHUB}@github.com/radcolor/${TARGET}" upstream && cd upstream
     rm -rf *
     cp -r ../${TARGET}/* .
     git checkout README.md && git add .
